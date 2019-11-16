@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "currencyData")
-data class CurrencyData(
+data class CurrencyDto(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name = "locale") val token: String,
     @ColumnInfo(name = "value") val name: Int

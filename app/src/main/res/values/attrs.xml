@@ -10,5 +10,6 @@
         <attr name="valueTextColor" format="reference" />
         <attr name="signSizeTextSize" format="dimension" />
         <attr name="signSizeTextColor" format="reference" />
+        <attr name="enableInput" format="boolean" />
     </declare-styleable>
 </resources>

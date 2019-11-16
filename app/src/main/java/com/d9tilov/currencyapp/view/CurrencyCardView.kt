@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.d9tilov.currencyapp.R
-import com.d9tilov.currencyapp.utils.Utils
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.*
 import kotlin.math.max
 
 class CurrencyCardView @JvmOverloads constructor(
@@ -27,6 +30,7 @@ class CurrencyCardView @JvmOverloads constructor(
     private val valueTextColor: Int
     private val signTextSize: Float
     private val signTextColor: Int
+    private val enableInput: Boolean
 
     private val innerPadding = res.getDimension(R.dimen.icon_inner_padding)
     private val betweenNamesPadding = res.getDimension(R.dimen.between_names_inner_padding)
@@ -46,85 +50,92 @@ class CurrencyCardView @JvmOverloads constructor(
         iconSize = typeArray.getDimension(
             R.styleable.CurrencyCardView_iconSize,
             res.getDimension(R.dimen.icon_size)
-        )
-        initIcon(iconSize)
+        ) / resources.displayMetrics.scaledDensity
+        initIcon()
 
         shortNameTextSize = typeArray.getDimension(
             R.styleable.CurrencyCardView_shortNameTextSize,
             res.getDimension(R.dimen.short_text_size)
-        )
+        ) / resources.displayMetrics.scaledDensity
         shortNameTextColor = typeArray.getColor(
             R.styleable.CurrencyCardView_shortNameTextSize,
             ContextCompat.getColor(context, R.color.shortNameTextColor)
         )
-        initShortName(shortNameTextSize, shortNameTextColor)
+        initShortName()
 
         longNameTextSize = typeArray.getDimension(
             R.styleable.CurrencyCardView_longNameTextSize,
             res.getDimension(R.dimen.long_text_size)
-        )
+        ) / resources.displayMetrics.scaledDensity
+
         longNameTextColor = typeArray.getColor(
             R.styleable.CurrencyCardView_shortNameTextSize,
             ContextCompat.getColor(context, R.color.longNameTextColor)
         )
-        initLongName(longNameTextSize, longNameTextColor)
+        initLongName()
 
         valueTextSize = typeArray.getDimension(
             R.styleable.CurrencyCardView_valueTextSize,
             res.getDimension(R.dimen.value_text_size)
-        )
+        ) / resources.displayMetrics.scaledDensity
         valueTextColor = typeArray.getColor(
             R.styleable.CurrencyCardView_valueTextColor,
             ContextCompat.getColor(context, R.color.valueTextColor)
         )
-        initValue(valueTextSize, valueTextColor)
+        enableInput = typeArray.getBoolean(R.styleable.CurrencyCardView_enableInput, false)
+        initValue()
 
         signTextSize = typeArray.getDimension(
             R.styleable.CurrencyCardView_signSizeTextSize,
             res.getDimension(R.dimen.sign_text_size)
-        )
+        ) / resources.displayMetrics.scaledDensity
         signTextColor = typeArray.getColor(
             R.styleable.CurrencyCardView_signSizeTextColor,
             ContextCompat.getColor(context, R.color.signTextColor)
         )
-        initSign(signTextSize, signTextColor)
+        initSign()
+
         typeArray.recycle()
     }
 
-    private fun initIcon(iconSize: Float) {
+    private fun initIcon() {
         iconFlag = AppCompatTextView(context)
         iconFlag.textSize = iconSize
         addView(iconFlag)
     }
 
-    private fun initLongName(textSize: Float, textColor: Int) {
+    private fun initLongName() {
         longName = TextView(context)
-        longName.textSize = textSize
-        longName.setTextColor(textColor)
+        longName.textSize = longNameTextSize
+        longName.setTextColor(longNameTextColor)
         longName.maxLines = 1
         addView(longName)
     }
 
-    private fun initShortName(textSize: Float, textColor: Int) {
+    private fun initShortName() {
         shortName = TextView(context)
-        shortName.textSize = textSize
-        shortName.setTextColor(textColor)
+        shortName.textSize = shortNameTextSize
+        shortName.setTextColor(shortNameTextColor)
         shortName.maxLines = 1
         addView(shortName)
     }
 
-    private fun initValue(textSize: Float, textColor: Int) {
-        value = TextView(context)
-        value.textSize = textSize
-        value.setTextColor(textColor)
+    private fun initValue() {
+        value = EditText(context)
+        value.textSize = valueTextSize
+        value.setTextColor(valueTextColor)
         value.maxLines = 1
+        value.isEnabled = enableInput
+        if (!enableInput) {
+            value.background = null
+        }
         addView(value)
     }
 
-    private fun initSign(textSize: Float, textColor: Int) {
+    private fun initSign() {
         sign = TextView(context)
-        sign.textSize = textSize
-        sign.setTextColor(textColor)
+        sign.textSize = signTextSize
+        sign.setTextColor(signTextColor)
         sign.maxLines = 1
         addView(sign)
     }
@@ -161,32 +172,32 @@ class CurrencyCardView @JvmOverloads constructor(
         var nameHeightUsed = centerY - halfNameBlockHeight
         longName.layout(
             innerPadding.toInt() + iconSize + innerPadding.toInt(),
-            nameHeightUsed.toInt() + betweenNamesPadding.toInt(),
+            nameHeightUsed.toInt() + 2 * betweenNamesPadding.toInt(),
             innerPadding.toInt() + iconSize + innerPadding.toInt() + longName.measuredWidth,
-            nameHeightUsed.toInt() + longName.measuredHeight + betweenNamesPadding.toInt()
+            nameHeightUsed.toInt() + longName.measuredHeight + 2 * betweenNamesPadding.toInt()
         )
 
         nameHeightUsed += longName.measuredHeight + 2 * betweenNamesPadding
         shortName.layout(
             innerPadding.toInt() + iconSize + innerPadding.toInt(),
-            nameHeightUsed.toInt() + betweenNamesPadding.toInt(),
+            nameHeightUsed.toInt() + betweenNamesPadding.toInt() / 2,
             innerPadding.toInt() + iconSize + innerPadding.toInt() + shortName.measuredWidth,
-            nameHeightUsed.toInt() + shortName.measuredHeight + betweenNamesPadding.toInt()
+            nameHeightUsed.toInt() + shortName.measuredHeight + betweenNamesPadding.toInt() / 2
+        )
+
+        sign.layout(
+            right - innerPadding.toInt() - sign.measuredWidth,
+            centerY - sign.measuredHeight / 2,
+            right - innerPadding.toInt(),
+            centerY + sign.measuredHeight / 2
         )
 
         val signSize = max(sign.measuredHeight, value.measuredHeight)
         val halfSignSize = signSize / 2
-        sign.layout(
-            right - innerPadding.toInt() - sign.measuredWidth,
-            centerY - halfSignSize,
-            right - innerPadding.toInt(),
-            centerY + signSize - halfSignSize
-        )
-
         value.layout(
-            right - innerPadding.toInt() - sign.measuredWidth - betweenNamesPadding.toInt() - value.measuredWidth,
+            right - innerPadding.toInt() - sign.measuredWidth - value.measuredWidth,
             centerY - halfSignSize,
-            right - innerPadding.toInt() - sign.measuredWidth - betweenNamesPadding.toInt(),
+            right - innerPadding.toInt() - sign.measuredWidth,
             centerY + signSize - halfSignSize
         )
     }
@@ -200,12 +211,12 @@ class CurrencyCardView @JvmOverloads constructor(
     }
 
     fun setIcon(icon: String) {
-        iconFlag.text = Utils.getCurrencyFlagEmojiBy(icon)
+        iconFlag.text = icon
     }
 
-    fun setValue(sum: Int) {
-        val fractional: Float = sum / 100f
-        value.text = fractional.toString()
+    fun setValue(sum: Double) {
+        val fractional: BigDecimal = sum.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+        value.text = String.format(Locale.getDefault(), fractional.toString())
     }
 
     fun setSign(signText: String) {
