@@ -1,4 +1,4 @@
-package com.d9tilov.currencyapp.db
+package com.d9tilov.currencyapp.storage
 
 import android.content.Context
 import androidx.room.Room

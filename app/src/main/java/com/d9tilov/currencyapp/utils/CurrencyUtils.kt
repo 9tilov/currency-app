@@ -1,7 +1,5 @@
 package com.d9tilov.currencyapp.utils
 
-import android.util.Log
-import timber.log.Timber
 import java.util.*
 
 object CurrencyUtils {
@@ -15,7 +13,6 @@ object CurrencyUtils {
     fun getCurrencySignBy(code: String): String = Currency.getInstance(code).symbol
 
     fun getCurrencyIcon(code: String): String {
-        Timber.d("code = $code")
         val firstChar = Character.codePointAt(code, 0) - ASCII_OFFSET + UNICODE_FLAG_OFFSET
         val secondChar = Character.codePointAt(code, 1) - ASCII_OFFSET + UNICODE_FLAG_OFFSET
         return String(Character.toChars(firstChar)) + String(Character.toChars(secondChar))

@@ -1,20 +1,17 @@
 package com.d9tilov.currencyapp.network
 
-import com.d9tilov.currencyapp.base.Mapper
-import com.d9tilov.currencyapp.network.data.CurrencyResponse
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
+import com.d9tilov.currencyapp.rates.repository.RemoteDataConverter
+import com.d9tilov.currencyapp.storage.CurrencySharedPreferences
 import io.reactivex.Single
 
 class CurrencyRemoteRepository(
     private val revolutApi: RevolutApi,
-    private val mapper: Mapper<CurrencyResponse, CurrencyRateData>
+    private val sharedPreferences: CurrencySharedPreferences
 ) {
 
-    fun updateCurrencyRates(baseCurrency: String): Single<CurrencyResponse> {
-        return revolutApi.getCurrencies(baseCurrency)
+    fun updateCurrencyRates(): Single<CurrencyRateData> {
+        return revolutApi.getCurrencies(sharedPreferences.loadBaseCurrency())
+            .map { RemoteDataConverter.convertFrom(it) }
     }
-
-    fun fromCurrencyResponse(currencyResponse: CurrencyResponse): CurrencyRateData =
-        mapper.convertFrom(currencyResponse)
-
 }

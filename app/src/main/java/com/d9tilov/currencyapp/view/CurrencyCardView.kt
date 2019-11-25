@@ -101,6 +101,7 @@ class CurrencyCardView @JvmOverloads constructor(
     private fun initIcon() {
         iconFlag = AppCompatTextView(context)
         iconFlag.textSize = iconSize
+        iconFlag.setTextColor( ContextCompat.getColor(context, R.color.colorPrimary))
         addView(iconFlag)
     }
 

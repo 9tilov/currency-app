@@ -1,30 +1,8 @@
 package com.d9tilov.currencyapp.base
 
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.main_progress_bar as progressBar
 
 abstract class BaseActivity : AppCompatActivity() {
-
-    fun setActionBarTitle(title: Int) {
-        supportActionBar?.setTitle(title)
-    }
-
-    fun showBackButton(show: Boolean) {
-        supportActionBar?.setDisplayHomeAsUpEnabled(show)
-    }
-
-    fun showProgress() {
-        progressBar?.visibility = View.VISIBLE
-    }
-
-    fun hideProgress() {
-        progressBar.let {
-            if (it.isShown) {
-                it.visibility = View.GONE
-            }
-        }
-    }
 
     override fun onBackPressed() {
         // Передача нажатия в текущее окно

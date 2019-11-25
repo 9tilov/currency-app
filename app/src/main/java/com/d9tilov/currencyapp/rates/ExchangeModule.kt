@@ -1,14 +1,13 @@
 package com.d9tilov.currencyapp.rates
 
-import com.d9tilov.currencyapp.base.Mapper
-import com.d9tilov.currencyapp.db.AppDatabase
-import com.d9tilov.currencyapp.db.CurrencyLocalRepository
+import android.content.Context
+import android.content.SharedPreferences
 import com.d9tilov.currencyapp.di.scope.ExchangeScope
 import com.d9tilov.currencyapp.network.CurrencyRemoteRepository
 import com.d9tilov.currencyapp.network.RevolutApi
-import com.d9tilov.currencyapp.network.data.CurrencyResponse
-import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
-import com.d9tilov.currencyapp.rates.repository.CurrencyResponseMapperImpl
+import com.d9tilov.currencyapp.storage.AppDatabase
+import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
+import com.d9tilov.currencyapp.storage.CurrencySharedPreferences
 import dagger.Module
 import dagger.Provides
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -21,21 +20,33 @@ class ExchangeModule {
     @ExchangeScope
     fun provideRemoteRepo(
         revolutApi: RevolutApi,
-        mapper: Mapper<CurrencyResponse, CurrencyRateData>
+        sharedPreferences: CurrencySharedPreferences
     ): CurrencyRemoteRepository {
-        return CurrencyRemoteRepository(revolutApi, mapper)
+        return CurrencyRemoteRepository(revolutApi, sharedPreferences)
     }
 
     @Provides
     @ExchangeScope
-    fun provideRemoteMapper(): Mapper<CurrencyResponse, CurrencyRateData> {
-        return CurrencyResponseMapperImpl()
+    fun provideLocalRepo(
+        appDatabase: AppDatabase,
+        sharedPreferences: CurrencySharedPreferences
+    ):
+            CurrencyLocalRepository {
+        return CurrencyLocalRepository(appDatabase, sharedPreferences)
     }
 
     @Provides
     @ExchangeScope
-    fun provideLocalRepo(appDatabase: AppDatabase): CurrencyLocalRepository {
-        return CurrencyLocalRepository(appDatabase)
+    fun provideSharedPreferences(context: Context):
+            SharedPreferences {
+        return context.getSharedPreferences("storage", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @ExchangeScope
+    fun provideCurrencyPreferences(sharedPreferences: SharedPreferences):
+            CurrencySharedPreferences {
+        return CurrencySharedPreferences(sharedPreferences)
     }
 
     @Provides
