@@ -8,7 +8,7 @@ data class CurrencyRateData(
     val currencyList: List<CurrencyItem>
 ) {
 
-    data class CurrencyItem(val id: String, val value: Double, val isBase: Boolean = false) {
+    data class CurrencyItem(val id: String, val value: Double, var isBase: Boolean = false) {
         val shortName: String = id
         val longName: String = CurrencyUtils.getCurrencyFullName(id)
         val icon: String = CurrencyUtils.getCurrencyIcon(id)

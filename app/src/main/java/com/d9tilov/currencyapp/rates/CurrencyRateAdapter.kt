@@ -4,9 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import com.d9tilov.currencyapp.R
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
-import com.d9tilov.currencyapp.utils.CurrencyUtils
+import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
+import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
 import com.d9tilov.currencyapp.view.CurrencyCardView
 
 class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRateViewHolder>() {
@@ -20,12 +22,22 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         }
     }
 
+    var itemClickListener: OnItemClickListener<CurrencyRateData.CurrencyItem>? = null
+    var valueChageLister: OnValueChangeListener<CurrencyRateData.CurrencyItem, Double>? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRateViewHolder {
         val context = parent.context
         val layoutId =
             if (viewType == CURRENCY_VIEW_TYPE.BASE.ordinal) R.layout.base_currency_item else R.layout.currency_item
         val view = LayoutInflater.from(context).inflate(layoutId, parent, false)
-        return CurrencyRateViewHolder(view)
+        val viewHolder = CurrencyRateViewHolder(view)
+        view.setOnClickListener {
+            val adapterPosition = viewHolder.adapterPosition
+            if (adapterPosition != NO_POSITION) {
+                itemClickListener?.onItemClick(currencies[adapterPosition], adapterPosition)
+            }
+        }
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: CurrencyRateViewHolder, position: Int) {

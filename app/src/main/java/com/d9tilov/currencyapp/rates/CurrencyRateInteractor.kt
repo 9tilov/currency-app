@@ -6,6 +6,7 @@ import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 
 class CurrencyRateInteractor(
     private val currencyLocalRepository: CurrencyLocalRepository,
@@ -15,12 +16,11 @@ class CurrencyRateInteractor(
 ) {
 
     @WorkerThread
-    fun updateCurrencyRates() {
-        currencyRemoteRepository.updateCurrencyRates()
+    fun updateCurrencyRates(): Single<Unit> {
+        return currencyRemoteRepository.updateCurrencyRates()
             .map { t: CurrencyRateData -> currencyLocalRepository.updateCurrencyList(t) }
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
-            .subscribe()
     }
 
     @WorkerThread
@@ -28,5 +28,15 @@ class CurrencyRateInteractor(
         return currencyLocalRepository.getAllCurrencies()
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
+    }
+
+    @WorkerThread
+    fun changeBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem): Single<Unit> {
+        currencyLocalRepository.updateBaseCurrency(baseCurrency)
+        return updateCurrencyRates()
+    }
+
+    fun writeDataAndCancel() {
+        currencyLocalRepository.cancelWorking()
     }
 }

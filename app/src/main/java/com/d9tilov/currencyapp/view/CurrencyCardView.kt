@@ -2,6 +2,7 @@ package com.d9tilov.currencyapp.view
 
 import android.content.Context
 import android.content.res.Resources
+import android.text.InputType
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.EditText
@@ -9,10 +10,12 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.d9tilov.currencyapp.R
+import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.max
+
 
 class CurrencyCardView @JvmOverloads constructor(
     context: Context,
@@ -101,7 +104,7 @@ class CurrencyCardView @JvmOverloads constructor(
     private fun initIcon() {
         iconFlag = AppCompatTextView(context)
         iconFlag.textSize = iconSize
-        iconFlag.setTextColor( ContextCompat.getColor(context, R.color.colorPrimary))
+        iconFlag.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
         addView(iconFlag)
     }
 
@@ -130,6 +133,10 @@ class CurrencyCardView @JvmOverloads constructor(
         if (!enableInput) {
             value.background = null
         }
+        value.inputType =
+            InputType.TYPE_CLASS_NUMBER or
+                    InputType.TYPE_NUMBER_FLAG_DECIMAL or
+                    InputType.TYPE_NUMBER_FLAG_SIGNED
         addView(value)
     }
 

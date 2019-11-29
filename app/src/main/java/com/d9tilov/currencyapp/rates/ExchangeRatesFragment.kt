@@ -2,6 +2,7 @@ package com.d9tilov.currencyapp.rates
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +11,7 @@ import com.d9tilov.currencyapp.R
 import com.d9tilov.currencyapp.base.BaseMvpFragment
 import com.d9tilov.currencyapp.di.ComponentHolder
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
+import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import javax.inject.Inject
 
 class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePresenter>(),
@@ -30,9 +32,14 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     override val isComponentDestroyable: Boolean
         get() = true
 
+    private val onItemClickListener = object : OnItemClickListener<CurrencyRateData.CurrencyItem> {
+        override fun onItemClick(item: CurrencyRateData.CurrencyItem, position: Int) {
+            presenter.onCurrencyClick(item)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         ComponentHolder.provideComponent(componentName) {
             ExchangeComponent.Initializer.init()
         }.inject(this)
@@ -40,6 +47,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         rvCurrencyList = view.findViewById(R.id.rv_currency_rate_list)
         swipeToRefreshContainer = view.findViewById(R.id.currency_container)
         rvCurrencyList.setHasFixedSize(true)
@@ -52,6 +60,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
             )
         )
         rvCurrencyList.adapter = adapter
+        adapter.itemClickListener = onItemClickListener
         swipeToRefreshContainer.setProgressBackgroundColorSchemeResource(
             R.color.swipeRefreshBackground
         )
@@ -69,8 +78,18 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         presenter.updateCurrencyList()
     }
 
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
     override fun updateCurrency(currencyList: List<CurrencyRateData.CurrencyItem>) {
         adapter.updateCurrencyRate(currencyList)
+        stopUpdating()
+    }
+
+    override fun stopUpdating() {
         swipeToRefreshContainer.isEnabled = true
         swipeToRefreshContainer.isRefreshing = false
     }

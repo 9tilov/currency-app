@@ -4,11 +4,18 @@ import androidx.annotation.WorkerThread
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.model.CurrencyDto
 import io.reactivex.Flowable
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.concurrent.Executor
 
 class CurrencyLocalRepository(
     private val database: AppDatabase,
-    private val currencySharedPreferences: CurrencySharedPreferences
+    private val currencySharedPreferences: CurrencySharedPreferences,
+    private val executor: Executor
 ) {
+
+    private val localCopyOfCurrencyList: MutableList<CurrencyRateData.CurrencyItem> =
+        mutableListOf()
 
     @WorkerThread
     fun updateCurrencyList(currencyRateData: CurrencyRateData) {
@@ -24,9 +31,13 @@ class CurrencyLocalRepository(
     @WorkerThread
     fun getAllCurrencies(): Flowable<List<CurrencyRateData.CurrencyItem>> {
         return database.currencyDao().getCurrencyList()
+            .doOnNext { localCopyOfCurrencyList.clear() }
             .flatMapSingle { list ->
                 Flowable.fromIterable(list)
                     .map { convert(it) }
+                    .doOnNext {
+                        localCopyOfCurrencyList.add(it)
+                    }
                     .toList()
             }
     }
@@ -38,5 +49,33 @@ class CurrencyLocalRepository(
             currencyDto.value.toDouble(),
             baseCurrency == currencyDto.name
         )
+    }
+
+    fun updateBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem) {
+        currencySharedPreferences.saveBaseCurrency(baseCurrency.shortName)
+        localCopyOfCurrencyList[0].isBase = false
+        val oldValue =
+            localCopyOfCurrencyList.find { it.id == baseCurrency.id }?.value
+        localCopyOfCurrencyList.find { it.id == baseCurrency.id }?.isBase = true
+        sortCurrency()
+        val currencyRateList = mutableListOf<CurrencyDto>()
+        currencyRateList.add(CurrencyDto(baseCurrency.shortName, "1"))
+        for (item in localCopyOfCurrencyList) {
+            val newValue = item.value / oldValue!!
+            currencyRateList.add(CurrencyDto(item.shortName, newValue.toString()))
+        }
+        executor.execute { database.currencyDao().updateCurrencyList(currencyRateList) }
+    }
+
+    private fun sortCurrency() {
+        localCopyOfCurrencyList.sortWith(compareBy({ !it.isBase }, { it.id }))
+    }
+
+    fun cancelWorking() {
+        val currencyRateList = mutableListOf<CurrencyDto>()
+        for (item in localCopyOfCurrencyList) {
+            currencyRateList.add(CurrencyDto(item.shortName, item.value.toString()))
+        }
+        executor.execute { database.currencyDao().updateCurrencyList(currencyRateList) }
     }
 }
