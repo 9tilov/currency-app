@@ -10,8 +10,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.d9tilov.currencyapp.R
 import com.d9tilov.currencyapp.base.BaseMvpFragment
 import com.d9tilov.currencyapp.di.ComponentHolder
+import com.d9tilov.currencyapp.rates.recycler.CurrencyRateAdapter
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
+import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
 import javax.inject.Inject
 
 class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePresenter>(),
@@ -19,7 +21,8 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     @Inject
     override lateinit var presenter: CurrencyRatePresenter
-    private val adapter: CurrencyRateAdapter = CurrencyRateAdapter()
+    private val adapter: CurrencyRateAdapter =
+        CurrencyRateAdapter()
     private lateinit var rvCurrencyList: RecyclerView
     private lateinit var swipeToRefreshContainer: SwipeRefreshLayout
 
@@ -37,6 +40,18 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
             presenter.onCurrencyClick(item)
         }
     }
+
+    private val onValueChangeListener =
+        object : OnValueChangeListener<CurrencyRateData.CurrencyItem, String> {
+            override fun onValueChanged(
+                item: CurrencyRateData.CurrencyItem,
+                value: String,
+                position: Int
+            ) {
+                presenter.onValueChange(value.toDouble())
+            }
+
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +76,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         )
         rvCurrencyList.adapter = adapter
         adapter.itemClickListener = onItemClickListener
+        adapter.valueChangeLister = onValueChangeListener
         swipeToRefreshContainer.setProgressBackgroundColorSchemeResource(
             R.color.swipeRefreshBackground
         )
@@ -72,12 +88,6 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         swipeToRefreshContainer.setOnRefreshListener(swipeToRefreshListener)
         presenter.getAllCurrencies()
     }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.updateCurrencyList()
-    }
-
 
     override fun onStop() {
         super.onStop()

@@ -3,6 +3,7 @@ package com.d9tilov.currencyapp.view
 import android.content.Context
 import android.content.res.Resources
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.EditText
@@ -10,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.d9tilov.currencyapp.R
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
@@ -43,6 +43,8 @@ class CurrencyCardView @JvmOverloads constructor(
     private lateinit var longName: TextView
     private lateinit var value: TextView
     private lateinit var sign: TextView
+
+    private var textWatcher: TextWatcher? = null
 
     init {
         val typeArray = getContext().obtainStyledAttributes(
@@ -223,11 +225,23 @@ class CurrencyCardView @JvmOverloads constructor(
     }
 
     fun setValue(sum: Double) {
-        val fractional: BigDecimal = sum.toBigDecimal().setScale(2, RoundingMode.HALF_EVEN)
+        val fractional: BigDecimal =
+            sum.toBigDecimal().setScale(ROUND_VALUE_AFTER_DOT, RoundingMode.HALF_EVEN)
         value.text = String.format(Locale.getDefault(), fractional.toString())
     }
 
     fun setSign(signText: String) {
         sign.text = signText
+    }
+
+    fun addTextWatcher(newTextWatcher: TextWatcher) {
+        if (textWatcher == null) {
+            this.textWatcher = newTextWatcher
+            this.value.addTextChangedListener(newTextWatcher)
+        }
+    }
+
+    companion object {
+        private const val ROUND_VALUE_AFTER_DOT = 2
     }
 }

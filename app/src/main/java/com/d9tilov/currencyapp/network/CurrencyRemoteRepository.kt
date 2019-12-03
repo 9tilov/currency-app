@@ -11,7 +11,7 @@ class CurrencyRemoteRepository(
 ) {
 
     fun updateCurrencyRates(): Single<CurrencyRateData> {
-        return revolutApi.getCurrencies(sharedPreferences.loadBaseCurrency())
+        return revolutApi.getCurrencies(sharedPreferences.loadBaseCurrency().shortName)
             .map { RemoteDataConverter.convertFrom(it) }
     }
 }

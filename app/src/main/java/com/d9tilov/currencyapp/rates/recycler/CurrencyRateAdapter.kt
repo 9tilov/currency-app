@@ -1,8 +1,9 @@
-package com.d9tilov.currencyapp.rates
+package com.d9tilov.currencyapp.rates.recycler
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import com.d9tilov.currencyapp.R
@@ -10,6 +11,8 @@ import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
 import com.d9tilov.currencyapp.view.CurrencyCardView
+import com.d9tilov.currencyapp.view.CurrencyTextWatcher
+import timber.log.Timber
 
 class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRateViewHolder>() {
 
@@ -23,7 +26,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     }
 
     var itemClickListener: OnItemClickListener<CurrencyRateData.CurrencyItem>? = null
-    var valueChageLister: OnValueChangeListener<CurrencyRateData.CurrencyItem, Double>? = null
+    var valueChangeLister: OnValueChangeListener<CurrencyRateData.CurrencyItem, String>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRateViewHolder {
         val context = parent.context
@@ -41,7 +44,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     }
 
     override fun onBindViewHolder(holder: CurrencyRateViewHolder, position: Int) {
-        holder.bind(currencies[position])
+        holder.bind(currencies[position], holder.itemViewType == CURRENCY_VIEW_TYPE.BASE.ordinal)
     }
 
     override fun onBindViewHolder(
@@ -53,6 +56,11 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
             onBindViewHolder(holder, position)
             return
         }
+        if (position == 0) {
+            return
+        }
+        val newValue = payloads[0] as Double
+        holder.bindWithPayload(newValue)
     }
 
     override fun getItemViewType(position: Int) =
@@ -63,20 +71,37 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
 
     override fun getItemCount() = currencies.size
 
-    fun updateCurrencyRate(currencies: List<CurrencyRateData.CurrencyItem>) {
-        this.currencies = currencies
-        notifyDataSetChanged()
+    fun updateCurrencyRate(newCurrencies: List<CurrencyRateData.CurrencyItem>) {
+        val diffUtilsCallback = CurrencyDiffUtil(currencies, newCurrencies)
+        val diffUtilsResult = DiffUtil.calculateDiff(diffUtilsCallback, true)
+        diffUtilsResult.dispatchUpdatesTo(this)
+        currencies = newCurrencies
+    }
+
+    private val onTextWatcher: CurrencyTextWatcher = object : CurrencyTextWatcher() {
+        override fun onValueChanged(newValue: String) {
+            Timber.d("onValueChanged")
+            valueChangeLister?.onValueChanged(currencies[0], newValue, 0)
+        }
     }
 
     inner class CurrencyRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val currencyItemView: CurrencyCardView = itemView.findViewById(R.id.currency_item)
 
-        fun bind(currencyItem: CurrencyRateData.CurrencyItem) {
+        fun bind(currencyItem: CurrencyRateData.CurrencyItem, isBase: Boolean) {
             currencyItemView.setLongName(currencyItem.longName)
             currencyItemView.setShortName(currencyItem.shortName)
             currencyItemView.setValue(currencyItem.value)
             currencyItemView.setIcon(currencyItem.icon)
             currencyItemView.setSign(currencyItem.sign)
+            if (isBase) {
+                Timber.d("bind")
+                currencyItemView.addTextWatcher(onTextWatcher)
+            }
+        }
+
+        fun bindWithPayload(value: Double) {
+            currencyItemView.setValue(value)
         }
     }
 }

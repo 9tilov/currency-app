@@ -1,12 +1,12 @@
 package com.d9tilov.currencyapp.utils
 
+import java.text.DecimalFormatSymbols
 import java.util.*
 
 object CurrencyUtils {
     private const val ASCII_OFFSET = 0x41
     private const val UNICODE_FLAG_OFFSET = 0x1F1E6
-    private const val CURRENCY_PLACEHOLDER_MASK = "0%s00"
-    private const val CURRENCY_OUTPUT_MASK = "%.2f"
+    private val decimalFormatSymbols = DecimalFormatSymbols.getInstance()
 
     fun getCurrencyFullName(code: String): String = Currency.getInstance(code).displayName
 
@@ -17,4 +17,6 @@ object CurrencyUtils {
         val secondChar = Character.codePointAt(code, 1) - ASCII_OFFSET + UNICODE_FLAG_OFFSET
         return String(Character.toChars(firstChar)) + String(Character.toChars(secondChar))
     }
+
+    fun getCurrencySeparator() = decimalFormatSymbols.decimalSeparator
 }

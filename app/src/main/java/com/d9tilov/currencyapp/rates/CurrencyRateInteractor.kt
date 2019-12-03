@@ -4,9 +4,10 @@ import androidx.annotation.WorkerThread
 import com.d9tilov.currencyapp.network.CurrencyRemoteRepository
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import io.reactivex.Single
+import timber.log.Timber
 
 class CurrencyRateInteractor(
     private val currencyLocalRepository: CurrencyLocalRepository,
@@ -16,9 +17,12 @@ class CurrencyRateInteractor(
 ) {
 
     @WorkerThread
-    fun updateCurrencyRates(): Single<Unit> {
-        return currencyRemoteRepository.updateCurrencyRates()
-            .map { t: CurrencyRateData -> currencyLocalRepository.updateCurrencyList(t) }
+    fun updateCurrencyRates(): Completable {
+        return Completable.fromSingle(
+            currencyRemoteRepository.updateCurrencyRates()
+                .map { t: CurrencyRateData ->
+                    currencyLocalRepository.updateCurrencyList(t)
+                })
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
     }
@@ -31,9 +35,16 @@ class CurrencyRateInteractor(
     }
 
     @WorkerThread
-    fun changeBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem): Single<Unit> {
+    fun changeBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem): Completable {
         currencyLocalRepository.updateBaseCurrency(baseCurrency)
         return updateCurrencyRates()
+    }
+
+    fun changeValue(value: Double): Completable {
+        Timber.d("changeValue")
+        currencyLocalRepository.changeValue(value)
+        return updateCurrencyRates()
+
     }
 
     fun writeDataAndCancel() {

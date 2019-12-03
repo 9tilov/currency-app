@@ -31,6 +31,12 @@ class CurrencyRatePresenter @Inject constructor(private val currencyRateInteract
         )
     }
 
+    fun onValueChange(value: Double) {
+        unSubscribeOnDetach(currencyRateInteractor.changeValue(value)
+            .subscribe({}, {})
+        )
+    }
+
     fun onStop() {
         currencyRateInteractor.writeDataAndCancel()
     }
