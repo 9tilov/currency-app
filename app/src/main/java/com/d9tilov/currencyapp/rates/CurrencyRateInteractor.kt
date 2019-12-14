@@ -2,12 +2,13 @@ package com.d9tilov.currencyapp.rates
 
 import androidx.annotation.WorkerThread
 import com.d9tilov.currencyapp.network.CurrencyRemoteRepository
+import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import timber.log.Timber
+import java.math.BigDecimal
 
 class CurrencyRateInteractor(
     private val currencyLocalRepository: CurrencyLocalRepository,
@@ -28,20 +29,19 @@ class CurrencyRateInteractor(
     }
 
     @WorkerThread
-    fun getAllCurrencies(): Flowable<List<CurrencyRateData.CurrencyItem>> {
+    fun getAllCurrencies(): Flowable<List<CurrencyItem>> {
         return currencyLocalRepository.getAllCurrencies()
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
     }
 
     @WorkerThread
-    fun changeBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem): Completable {
+    fun changeBaseCurrency(baseCurrency: CurrencyItem): Completable {
         currencyLocalRepository.updateBaseCurrency(baseCurrency)
         return updateCurrencyRates()
     }
 
-    fun changeValue(value: Double): Completable {
-        Timber.d("changeValue")
+    fun changeValue(value: BigDecimal): Completable {
         currencyLocalRepository.changeValue(value)
         return updateCurrencyRates()
 

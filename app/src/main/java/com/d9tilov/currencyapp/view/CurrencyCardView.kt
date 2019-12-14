@@ -224,9 +224,9 @@ class CurrencyCardView @JvmOverloads constructor(
         iconFlag.text = icon
     }
 
-    fun setValue(sum: Double) {
+    fun setValue(sum: BigDecimal) {
         val fractional: BigDecimal =
-            sum.toBigDecimal().setScale(ROUND_VALUE_AFTER_DOT, RoundingMode.HALF_EVEN)
+            sum.setScale(ROUND_VALUE_AFTER_DOT, RoundingMode.HALF_EVEN)
         value.text = String.format(Locale.getDefault(), fractional.toString())
     }
 

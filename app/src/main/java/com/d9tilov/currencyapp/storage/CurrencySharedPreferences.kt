@@ -1,6 +1,7 @@
 package com.d9tilov.currencyapp.storage
 
 import android.content.SharedPreferences
+import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 
 class CurrencySharedPreferences(private val sharedPreferences: SharedPreferences) {
@@ -11,17 +12,17 @@ class CurrencySharedPreferences(private val sharedPreferences: SharedPreferences
         private const val PREF_KEY_LAST_UPDATE_TIME = "last_update_time"
     }
 
-    fun saveBaseCurrency(baseCurrency: CurrencyRateData.CurrencyItem) {
+    fun saveBaseCurrency(baseCurrency: CurrencyItem) {
         val editor = sharedPreferences.edit()
-        editor.putString(PREF_KEY_BASE_CURRENCY, baseCurrency.shortName)
-        editor.putFloat(PREF_KEY_BASE_CURRENCY_VALUE, baseCurrency.value.toFloat())
+        editor.putString(PREF_KEY_BASE_CURRENCY, baseCurrency.name)
+        editor.putString(PREF_KEY_BASE_CURRENCY_VALUE, baseCurrency.value.toString())
         editor.apply()
     }
 
-    fun loadBaseCurrency(): CurrencyRateData.CurrencyItem {
+    fun loadBaseCurrency(): CurrencyItem {
         val name = sharedPreferences.getString(PREF_KEY_BASE_CURRENCY, "EUR")
-        val value = sharedPreferences.getFloat(PREF_KEY_BASE_CURRENCY_VALUE, 1.0f)
-        return CurrencyRateData.CurrencyItem(name!!, value.toDouble(), true)
+        val value = sharedPreferences.getString(PREF_KEY_BASE_CURRENCY_VALUE, "1")
+        return CurrencyItem(name!!, value!!.toBigDecimal(), true)
     }
 
     fun saveLastUpdateTime(time: Long) {

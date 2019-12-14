@@ -2,8 +2,9 @@ package com.d9tilov.currencyapp.network.data
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.math.BigDecimal
 
-typealias CurrencyRateMap = MutableMap<String, Double>
+typealias CurrencyRateMap = MutableMap<String, BigDecimal>
 
 data class CurrencyResponse(
     @SerializedName("base") @Expose val base: String,

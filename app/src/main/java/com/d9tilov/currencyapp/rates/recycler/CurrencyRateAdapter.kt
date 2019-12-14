@@ -7,16 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import com.d9tilov.currencyapp.R
-import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
+import com.d9tilov.currencyapp.rates.repository.CurrencyItem
+import com.d9tilov.currencyapp.utils.CurrencyUtils
 import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
 import com.d9tilov.currencyapp.view.CurrencyCardView
 import com.d9tilov.currencyapp.view.CurrencyTextWatcher
 import timber.log.Timber
+import java.math.BigDecimal
 
 class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRateViewHolder>() {
 
-    private var currencies: List<CurrencyRateData.CurrencyItem> = ArrayList()
+    private var currencies: List<CurrencyItem> = ArrayList()
 
     private companion object {
         enum class CURRENCY_VIEW_TYPE {
@@ -25,8 +27,8 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         }
     }
 
-    var itemClickListener: OnItemClickListener<CurrencyRateData.CurrencyItem>? = null
-    var valueChangeLister: OnValueChangeListener<CurrencyRateData.CurrencyItem, String>? = null
+    var itemClickListener: OnItemClickListener<CurrencyItem>? = null
+    var valueChangeLister: OnValueChangeListener<CurrencyItem, BigDecimal>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRateViewHolder {
         val context = parent.context
@@ -59,7 +61,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         if (position == 0) {
             return
         }
-        val newValue = payloads[0] as Double
+        val newValue = payloads[0] as BigDecimal
         holder.bindWithPayload(newValue)
     }
 
@@ -71,7 +73,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
 
     override fun getItemCount() = currencies.size
 
-    fun updateCurrencyRate(newCurrencies: List<CurrencyRateData.CurrencyItem>) {
+    fun updateCurrencyRate(newCurrencies: List<CurrencyItem>) {
         val diffUtilsCallback = CurrencyDiffUtil(currencies, newCurrencies)
         val diffUtilsResult = DiffUtil.calculateDiff(diffUtilsCallback, true)
         diffUtilsResult.dispatchUpdatesTo(this)
@@ -81,26 +83,26 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     private val onTextWatcher: CurrencyTextWatcher = object : CurrencyTextWatcher() {
         override fun onValueChanged(newValue: String) {
             Timber.d("onValueChanged")
-            valueChangeLister?.onValueChanged(currencies[0], newValue, 0)
+            valueChangeLister?.onValueChanged(currencies[0], newValue.toBigDecimal(), 0)
         }
     }
 
     inner class CurrencyRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val currencyItemView: CurrencyCardView = itemView.findViewById(R.id.currency_item)
 
-        fun bind(currencyItem: CurrencyRateData.CurrencyItem, isBase: Boolean) {
-            currencyItemView.setLongName(currencyItem.longName)
-            currencyItemView.setShortName(currencyItem.shortName)
+        fun bind(currencyItem: CurrencyItem, isBase: Boolean) {
+            currencyItemView.setLongName(CurrencyUtils.getCurrencyFullName(currencyItem.name))
+            currencyItemView.setShortName(currencyItem.name)
             currencyItemView.setValue(currencyItem.value)
-            currencyItemView.setIcon(currencyItem.icon)
-            currencyItemView.setSign(currencyItem.sign)
+            currencyItemView.setIcon(CurrencyUtils.getCurrencyIcon(currencyItem.name))
+            currencyItemView.setSign(CurrencyUtils.getCurrencySignBy(currencyItem.name))
             if (isBase) {
                 Timber.d("bind")
                 currencyItemView.addTextWatcher(onTextWatcher)
             }
         }
 
-        fun bindWithPayload(value: Double) {
+        fun bindWithPayload(value: BigDecimal) {
             currencyItemView.setValue(value)
         }
     }

@@ -1,15 +1,15 @@
 package com.d9tilov.currencyapp.rates.recycler
 
 import androidx.recyclerview.widget.DiffUtil
-import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
+import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 
 class CurrencyDiffUtil(
-    private val oldCurrenciesList: List<CurrencyRateData.CurrencyItem>,
-    private val newCurrenciesList: List<CurrencyRateData.CurrencyItem>
+    private val oldCurrenciesList: List<CurrencyItem>,
+    private val newCurrenciesList: List<CurrencyItem>
 ) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldCurrenciesList[oldItemPosition].id == newCurrenciesList[newItemPosition].id
+        return oldCurrenciesList[oldItemPosition].name == newCurrenciesList[newItemPosition].name
     }
 
     override fun getOldListSize(): Int {

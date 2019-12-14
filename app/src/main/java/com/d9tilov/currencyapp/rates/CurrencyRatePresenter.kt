@@ -1,7 +1,9 @@
 package com.d9tilov.currencyapp.rates
 
 import com.d9tilov.currencyapp.base.BasePresenter
+import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class CurrencyRatePresenter @Inject constructor(private val currencyRateInteractor: CurrencyRateInteractor) :
@@ -24,14 +26,14 @@ class CurrencyRatePresenter @Inject constructor(private val currencyRateInteract
         )
     }
 
-    fun onCurrencyClick(baseCurrency: CurrencyRateData.CurrencyItem) {
+    fun onCurrencyClick(baseCurrency: CurrencyItem) {
         unSubscribeOnDetach(
             currencyRateInteractor.changeBaseCurrency(baseCurrency)
                 .subscribe({}, {})
         )
     }
 
-    fun onValueChange(value: Double) {
+    fun onValueChange(value: BigDecimal) {
         unSubscribeOnDetach(currencyRateInteractor.changeValue(value)
             .subscribe({}, {})
         )
