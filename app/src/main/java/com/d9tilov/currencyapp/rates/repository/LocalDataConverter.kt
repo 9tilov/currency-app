@@ -1,7 +1,7 @@
 package com.d9tilov.currencyapp.rates.repository
 
-import com.d9tilov.currencyapp.storage.model.CurrencyDto
 import com.d9tilov.currencyapp.network.data.CurrencyResponse
+import com.d9tilov.currencyapp.storage.model.CurrencyDto
 
 object LocalDataConverter {
 

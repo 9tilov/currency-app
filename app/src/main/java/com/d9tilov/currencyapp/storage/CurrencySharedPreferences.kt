@@ -2,7 +2,6 @@ package com.d9tilov.currencyapp.storage
 
 import android.content.SharedPreferences
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
-import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 
 class CurrencySharedPreferences(private val sharedPreferences: SharedPreferences) {
 

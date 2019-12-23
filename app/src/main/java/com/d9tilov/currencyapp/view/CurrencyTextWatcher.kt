@@ -1,32 +1,26 @@
 package com.d9tilov.currencyapp.view
 
-import android.text.Editable
-import android.text.TextWatcher
-import io.reactivex.subjects.PublishSubject
+import android.widget.EditText
+import androidx.core.widget.addTextChangedListener
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
+import java.math.BigDecimal
 
-abstract class CurrencyTextWatcher : TextWatcher {
+object CurrencyTextWatcher {
 
-    private var subject: PublishSubject<String> = PublishSubject.create()
-
-    override fun afterTextChanged(s: Editable?) {
-        Timber.d("afterTextChanged")
-        subject.onNext(s.toString())
-    }
-
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-    }
-
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-    }
-
-    abstract fun onValueChanged(newValue: String)
-
-    init {
-        subject
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .distinctUntilChanged()
-            .subscribe({ onValueChanged(it) }, {})
+    fun fromView(editText: EditText): Observable<BigDecimal> {
+        val subject: BehaviorSubject<BigDecimal> = BehaviorSubject.create()
+        editText.addTextChangedListener {
+            val number = it.toString()
+            if (!it.isNullOrEmpty() && number.toBigDecimalOrNull() != null && number.toBigDecimal().compareTo(
+                    BigDecimal.ZERO) != 0) {
+                Timber.d("division = " +  it.toString().toBigDecimal())
+                subject.onNext(it.toString().toBigDecimal())
+            } else {
+                subject.onNext(BigDecimal.ZERO)
+            }
+        }
+        return subject
     }
 }

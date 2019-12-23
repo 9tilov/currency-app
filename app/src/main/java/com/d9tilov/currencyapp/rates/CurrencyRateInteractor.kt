@@ -1,6 +1,7 @@
 package com.d9tilov.currencyapp.rates
 
 import androidx.annotation.WorkerThread
+import com.d9tilov.currencyapp.BuildConfig
 import com.d9tilov.currencyapp.network.CurrencyRemoteRepository
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
@@ -18,11 +19,11 @@ class CurrencyRateInteractor(
 ) {
 
     @WorkerThread
-    fun updateCurrencyRates(): Completable {
+    fun updateCurrencyRates(baseItem: CurrencyItem?): Completable {
         return Completable.fromSingle(
             currencyRemoteRepository.updateCurrencyRates()
                 .map { t: CurrencyRateData ->
-                    currencyLocalRepository.updateCurrencyList(t)
+                    currencyLocalRepository.updateCurrencyList(t, baseItem)
                 })
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
@@ -37,13 +38,17 @@ class CurrencyRateInteractor(
 
     @WorkerThread
     fun changeBaseCurrency(baseCurrency: CurrencyItem): Completable {
-        currencyLocalRepository.updateBaseCurrency(baseCurrency)
-        return updateCurrencyRates()
+        var localBaseCurrency: CurrencyItem = baseCurrency
+        if (BuildConfig.RESET_BASE_VALUE_AFTER_CHOOSE) {
+            localBaseCurrency = CurrencyItem(baseCurrency.name, BigDecimal.ONE, true)
+        }
+        currencyLocalRepository.updateBaseCurrency(localBaseCurrency)
+        return updateCurrencyRates(localBaseCurrency)
     }
 
-    fun changeValue(value: BigDecimal): Completable {
-        currencyLocalRepository.changeValue(value)
-        return updateCurrencyRates()
+    fun changeValue(baseCurrency: CurrencyItem): Completable {
+        currencyLocalRepository.changeValue(baseCurrency)
+        return updateCurrencyRates(baseCurrency)
 
     }
 

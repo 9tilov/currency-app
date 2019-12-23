@@ -10,7 +10,7 @@ object RemoteDataConverter {
     fun convertFrom(input: CurrencyResponse): CurrencyRateData {
         val date =
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(input.date)?.time ?: 0
-        val currencyRateList = mutableListOf<CurrencyItem>()
+        val currencyRateList = mutableSetOf<CurrencyItem>()
         val baseItem = CurrencyItem(input.base, BigDecimal.ONE, true)
         currencyRateList.add(baseItem)
         for ((key, value) in input.rates) {

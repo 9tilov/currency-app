@@ -18,15 +18,14 @@ class CurrencyLocalRepository(
         mutableListOf()
 
     @WorkerThread
-    fun updateCurrencyList(currencyRateData: CurrencyRateData) {
+    fun updateCurrencyList(currencyRateData: CurrencyRateData, baseItem: CurrencyItem?) {
         val currencyRateList = mutableListOf<CurrencyDto>()
-        val baseItem = currencyRateData.currencyList.find { it.isBase }
-            ?: throw IllegalAccessException("Can't find base item")
-        val baseValue = baseItem.value
+        val baseValue = baseItem?.value ?: throw IllegalAccessException("Can't find base item")
         for (item in currencyRateData.currencyList) {
             val newValue = baseValue * item.value
             currencyRateList.add(CurrencyDto(item.name, newValue.toString()))
         }
+        sortCurrency(currencyRateList, baseItem)
         database.currencyDao().updateCurrencyList(currencyRateList)
     }
 
@@ -61,39 +60,25 @@ class CurrencyLocalRepository(
             return
         }
         localCopyOfCurrencyList[0].isBase = false
-        val oldValue =
-            localCopyOfCurrencyList
-                .find { it.name == baseCurrency.name }
-                ?.value
-                ?: return
-        if (oldValue.compareTo(BigDecimal.ZERO) == 0) {
-            return
-        }
-        localCopyOfCurrencyList.find { it.name == baseCurrency.name }?.isBase = true
-        sortCurrency()
-        val currencyRateList = mutableListOf<CurrencyDto>()
-        for (item in localCopyOfCurrencyList) {
-            val newValue = item.value / oldValue
-            currencyRateList.add(CurrencyDto(item.name, newValue.toString()))
-        }
-        executor.execute { database.currencyDao().updateCurrencyList(currencyRateList) }
     }
 
-    fun changeValue(newValue: BigDecimal) {
+    fun changeValue(newBaseItem: CurrencyItem) {
         if (localCopyOfCurrencyList.isEmpty()) {
             return
         }
-        val oldValue = localCopyOfCurrencyList[0].value
+        var oldValue = localCopyOfCurrencyList[0].value
+        if (oldValue.compareTo(BigDecimal.ZERO) == 0) {
+            oldValue = BigDecimal.ONE
+        }
         val currencyRateList = mutableListOf<CurrencyDto>()
         for (item in localCopyOfCurrencyList) {
-            val newRecountedValue = item.value * newValue / oldValue
+            val newRecountedValue = item.value * newBaseItem.value / oldValue
             currencyRateList.add(CurrencyDto(item.name, newRecountedValue.toString()))
         }
-        executor.execute { database.currencyDao().updateCurrencyList(currencyRateList) }
     }
 
-    private fun sortCurrency() {
-        localCopyOfCurrencyList.sortWith(compareBy({ !it.isBase }, { it.name }))
+    private fun sortCurrency(currencyList: MutableList<CurrencyDto>, baseCurrency: CurrencyItem) {
+        currencyList.sortWith(compareBy({ it.name != baseCurrency.name }, { it.name }))
     }
 
     fun cancelWorking() {

@@ -2,10 +2,10 @@ package com.d9tilov.currencyapp.di.component
 
 import android.content.Context
 import com.d9tilov.currencyapp.MainActivity
-import com.d9tilov.currencyapp.storage.StorageModule
 import com.d9tilov.currencyapp.di.ApplicationProvider
 import com.d9tilov.currencyapp.di.module.ContextModule
 import com.d9tilov.currencyapp.network.NetworkModule
+import com.d9tilov.currencyapp.storage.StorageModule
 import dagger.Component
 import javax.inject.Singleton
 

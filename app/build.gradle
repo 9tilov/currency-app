@@ -31,6 +31,8 @@ android {
         versionCode 1000 * (1000 * versionMajor + 100 * versionMinor + versionPatch) + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "boolean", "RESET_BASE_VALUE_AFTER_CHOOSE", "true"
     }
     buildTypes {
         release {

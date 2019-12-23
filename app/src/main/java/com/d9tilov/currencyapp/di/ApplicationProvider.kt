@@ -1,8 +1,8 @@
 package com.d9tilov.currencyapp.di
 
 import android.content.Context
-import com.d9tilov.currencyapp.storage.AppDatabase
 import com.d9tilov.currencyapp.network.RevolutApi
+import com.d9tilov.currencyapp.storage.AppDatabase
 
 interface ApplicationProvider {
 

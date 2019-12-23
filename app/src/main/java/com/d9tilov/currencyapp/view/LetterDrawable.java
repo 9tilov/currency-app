@@ -10,10 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.d9tilov.currencyapp.utils.CurrencyUtils;
-
-import java.util.Currency;
-
 import javax.annotation.Nonnull;
 
 public class LetterDrawable extends Drawable {

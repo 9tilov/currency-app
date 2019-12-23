@@ -41,7 +41,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     private val onItemClickListener = object : OnItemClickListener<CurrencyItem> {
         override fun onItemClick(item: CurrencyItem, position: Int) {
             presenter.onCurrencyClick(item)
-            Handler().postDelayed({ rvCurrencyList.smoothScrollToPosition(0) }, 200)
+            Handler().postDelayed({ rvCurrencyList.smoothScrollToPosition(0) }, 500)
         }
     }
 
@@ -52,7 +52,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
                 value: BigDecimal,
                 position: Int
             ) {
-                presenter.onValueChange(value)
+                presenter.onValueChange(CurrencyItem(item.name, value, true))
             }
         }
 
@@ -95,7 +95,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     override fun onStart() {
         super.onStart()
-        presenter.updateCurrencyList()
+        presenter.updateCurrencyList(CurrencyItem("EUR", BigDecimal.ONE, true))
     }
 
     override fun onStop() {
@@ -114,7 +114,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     }
 
     private val swipeToRefreshListener = {
-        presenter.updateCurrencyList()
+        presenter.updateCurrencyList(adapter.getBaseItem())
     }
 
     companion object {

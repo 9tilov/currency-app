@@ -13,18 +13,24 @@ import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
 import com.d9tilov.currencyapp.view.CurrencyCardView
 import com.d9tilov.currencyapp.view.CurrencyTextWatcher
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import java.math.BigDecimal
+import java.util.concurrent.TimeUnit
 
 class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRateViewHolder>() {
 
     private var currencies: List<CurrencyItem> = ArrayList()
+    private val disposable = CompositeDisposable()
 
     private companion object {
         enum class CURRENCY_VIEW_TYPE {
             BASE,
             COMMON
         }
+
+        private const val EDIT_TEXT_DEBOUNCE_IN_MILLS = 200L
     }
 
     var itemClickListener: OnItemClickListener<CurrencyItem>? = null
@@ -34,6 +40,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         val context = parent.context
         val layoutId =
             if (viewType == CURRENCY_VIEW_TYPE.BASE.ordinal) R.layout.base_currency_item else R.layout.currency_item
+        Timber.d("onCreateViewHolder viewType = %s", viewType)
         val view = LayoutInflater.from(context).inflate(layoutId, parent, false)
         val viewHolder = CurrencyRateViewHolder(view)
         view.setOnClickListener {
@@ -80,30 +87,44 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         currencies = newCurrencies
     }
 
-    private val onTextWatcher: CurrencyTextWatcher = object : CurrencyTextWatcher() {
-        override fun onValueChanged(newValue: String) {
-            Timber.d("onValueChanged")
-            valueChangeLister?.onValueChanged(currencies[0], newValue.toBigDecimal(), 0)
-        }
+    fun getBaseItem(): CurrencyItem? {
+        return currencies[0]
     }
 
     inner class CurrencyRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         private val currencyItemView: CurrencyCardView = itemView.findViewById(R.id.currency_item)
 
         fun bind(currencyItem: CurrencyItem, isBase: Boolean) {
+            Timber.d("bind")
             currencyItemView.setLongName(CurrencyUtils.getCurrencyFullName(currencyItem.name))
             currencyItemView.setShortName(currencyItem.name)
             currencyItemView.setValue(currencyItem.value)
             currencyItemView.setIcon(CurrencyUtils.getCurrencyIcon(currencyItem.name))
             currencyItemView.setSign(CurrencyUtils.getCurrencySignBy(currencyItem.name))
             if (isBase) {
-                Timber.d("bind")
-                currencyItemView.addTextWatcher(onTextWatcher)
+                disposable.clear()
+                Timber.d("isBase")
+                disposable.add(formEditTextDisposable())
             }
         }
 
         fun bindWithPayload(value: BigDecimal) {
+            Timber.d("bindWithPayload")
             currencyItemView.setValue(value)
+        }
+
+        private fun formEditTextDisposable(): Disposable {
+            return CurrencyTextWatcher.fromView(currencyItemView.value)
+                .debounce(EDIT_TEXT_DEBOUNCE_IN_MILLS, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .subscribe({
+                    valueChangeLister?.onValueChanged(
+                        currencies[0],
+                        it ?: BigDecimal.ONE,
+                        0
+                    )
+                }, { Timber.d("oneerror = %s", it) })
         }
     }
 }

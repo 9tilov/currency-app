@@ -41,7 +41,7 @@ class CurrencyCardView @JvmOverloads constructor(
     private lateinit var iconFlag: AppCompatTextView
     private lateinit var shortName: TextView
     private lateinit var longName: TextView
-    private lateinit var value: TextView
+    lateinit var value: EditText
     private lateinit var sign: TextView
 
     private var textWatcher: TextWatcher? = null
@@ -227,7 +227,7 @@ class CurrencyCardView @JvmOverloads constructor(
     fun setValue(sum: BigDecimal) {
         val fractional: BigDecimal =
             sum.setScale(ROUND_VALUE_AFTER_DOT, RoundingMode.HALF_EVEN)
-        value.text = String.format(Locale.getDefault(), fractional.toString())
+        value.setText(String.format(Locale.getDefault(), fractional.toString()))
     }
 
     fun setSign(signText: String) {
