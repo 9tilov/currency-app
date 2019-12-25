@@ -11,7 +11,6 @@ abstract class BaseFragment : Fragment() {
 
     abstract val layoutRes: Int
     abstract val componentName: String
-    abstract val fragmentTag: String
     abstract val isComponentDestroyable: Boolean
 
     override fun onCreateView(

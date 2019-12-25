@@ -25,6 +25,7 @@ class CurrencyRateInteractor(
                 .map { t: CurrencyRateData ->
                     currencyLocalRepository.updateCurrencyList(t, baseItem)
                 })
+            .doOnError { }
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
     }
@@ -42,7 +43,7 @@ class CurrencyRateInteractor(
         if (BuildConfig.RESET_BASE_VALUE_AFTER_CHOOSE) {
             localBaseCurrency = CurrencyItem(baseCurrency.name, BigDecimal.ONE, true)
         }
-        currencyLocalRepository.updateBaseCurrency(localBaseCurrency)
+        currencyLocalRepository.changeBaseCurrency(localBaseCurrency)
         return updateCurrencyRates(localBaseCurrency)
     }
 

@@ -21,10 +21,10 @@ class MainActivity : BaseActivity() {
             MainComponent.Initializer.init()
         }.inject(this)
 
-        val fragment = ExchangeRatesFragment.newInstance()
+        val fragment = supportFragmentManager.findFragmentByTag(ExchangeRatesFragment.TAG)?:ExchangeRatesFragment.newInstance()
         supportFragmentManager
             .beginTransaction()
-            .add(getFragmentContainerId(), fragment, fragment.fragmentTag)
+            .replace(getFragmentContainerId(), fragment, ExchangeRatesFragment.TAG)
             .commit()
     }
 }

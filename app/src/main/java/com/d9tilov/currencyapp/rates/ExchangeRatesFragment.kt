@@ -33,8 +33,6 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         get() = R.layout.fragment_exchange_rates
     override val componentName: String
         get() = ExchangeComponent::class.java.name
-    override val fragmentTag: String
-        get() = TAG
     override val isComponentDestroyable: Boolean
         get() = true
 
@@ -119,7 +117,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     companion object {
 
-        const val TAG = "ExchangeRatesFragment"
+        public const val TAG = "ExchangeRatesFragment"
 
         @JvmStatic
         fun newInstance() = ExchangeRatesFragment()
