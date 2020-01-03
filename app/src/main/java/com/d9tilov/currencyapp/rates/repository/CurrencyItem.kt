@@ -8,11 +8,14 @@ data class CurrencyItem(val name: String, val value: BigDecimal, var isBase: Boo
         if (other !is CurrencyItem) return false
 
         if (name != other.name) return false
-
         return true
     }
 
     override fun hashCode(): Int {
-        return name.hashCode()
+        var result = name.hashCode()
+        result = 31 * result + value.hashCode()
+        result = 31 * result + isBase.hashCode()
+        return result
     }
+
 }

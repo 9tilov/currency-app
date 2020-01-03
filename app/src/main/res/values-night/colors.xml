@@ -4,5 +4,9 @@
     <color name="colorPrimaryDark">@color/colorNightDark</color>
     <color name="colorAccent">#FFFFFF</color>
 
+    <color name="shortNameTextColor">#808080</color>
+    <color name="longNameTextColor">#fff</color>
+    <color name="valueTextColor">#fff</color>
+    <color name="signTextColor">#808080</color>
     <color name="swipeRefreshBackground">@color/colorAccent</color>
 </resources>

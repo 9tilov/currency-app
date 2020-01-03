@@ -5,10 +5,8 @@ import com.d9tilov.currencyapp.storage.model.CurrencyDto
 
 object LocalDataConverter {
 
-    fun convertFrom(input: CurrencyResponse): List<CurrencyDto> {
-        val currencyRateList = mutableListOf<CurrencyDto>()
-        val baseItem = CurrencyDto(input.base, "1")
-        currencyRateList.add(baseItem)
+    fun convertFrom(input: CurrencyResponse): Set<CurrencyDto> {
+        val currencyRateList = mutableSetOf<CurrencyDto>()
         for ((key, value) in input.rates) {
             val item = CurrencyDto(key, value.toString())
             currencyRateList.add(item)

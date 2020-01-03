@@ -2,10 +2,13 @@ package com.d9tilov.currencyapp.view
 
 import android.content.Context
 import android.content.res.Resources
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
@@ -15,7 +18,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.max
-
 
 class CurrencyCardView @JvmOverloads constructor(
     context: Context,
@@ -131,6 +133,9 @@ class CurrencyCardView @JvmOverloads constructor(
         value.textSize = valueTextSize
         value.setTextColor(valueTextColor)
         value.maxLines = 1
+        val filterArray = arrayOfNulls<InputFilter>(1)
+        filterArray[0] = LengthFilter(MAX_VALUE_LENGTH)
+        value.filters = filterArray
         value.isEnabled = enableInput
         if (!enableInput) {
             value.background = null
@@ -139,6 +144,7 @@ class CurrencyCardView @JvmOverloads constructor(
             InputType.TYPE_CLASS_NUMBER or
                     InputType.TYPE_NUMBER_FLAG_DECIMAL or
                     InputType.TYPE_NUMBER_FLAG_SIGNED
+        value.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
         addView(value)
     }
 
@@ -243,5 +249,6 @@ class CurrencyCardView @JvmOverloads constructor(
 
     companion object {
         private const val ROUND_VALUE_AFTER_DOT = 2
+        private const val MAX_VALUE_LENGTH = 20
     }
 }

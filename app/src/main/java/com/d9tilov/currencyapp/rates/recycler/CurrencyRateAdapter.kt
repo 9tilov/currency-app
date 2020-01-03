@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRateViewHolder>() {
 
-    private var currencies: List<CurrencyItem> = ArrayList()
+    private var currencies: MutableList<CurrencyItem> = mutableListOf()
     private val disposable = CompositeDisposable()
 
     private companion object {
@@ -40,7 +40,6 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         val context = parent.context
         val layoutId =
             if (viewType == CURRENCY_VIEW_TYPE.BASE.ordinal) R.layout.base_currency_item else R.layout.currency_item
-        Timber.d("onCreateViewHolder viewType = %s", viewType)
         val view = LayoutInflater.from(context).inflate(layoutId, parent, false)
         val viewHolder = CurrencyRateViewHolder(view)
         view.setOnClickListener {
@@ -83,8 +82,9 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     fun updateCurrencyRate(newCurrencies: List<CurrencyItem>) {
         val diffUtilsCallback = CurrencyDiffUtil(currencies, newCurrencies)
         val diffUtilsResult = DiffUtil.calculateDiff(diffUtilsCallback, true)
+        currencies.clear()
+        currencies.addAll(newCurrencies)
         diffUtilsResult.dispatchUpdatesTo(this)
-        currencies = newCurrencies
     }
 
     fun getBaseItem(): CurrencyItem? {
@@ -96,7 +96,6 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
         private val currencyItemView: CurrencyCardView = itemView.findViewById(R.id.currency_item)
 
         fun bind(currencyItem: CurrencyItem, isBase: Boolean) {
-            Timber.d("bind")
             currencyItemView.setLongName(CurrencyUtils.getCurrencyFullName(currencyItem.name))
             currencyItemView.setShortName(currencyItem.name)
             currencyItemView.setValue(currencyItem.value)
@@ -104,13 +103,11 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
             currencyItemView.setSign(CurrencyUtils.getCurrencySignBy(currencyItem.name))
             if (isBase) {
                 disposable.clear()
-                Timber.d("isBase")
                 disposable.add(formEditTextDisposable())
             }
         }
 
         fun bindWithPayload(value: BigDecimal) {
-            Timber.d("bindWithPayload")
             currencyItemView.setValue(value)
         }
 

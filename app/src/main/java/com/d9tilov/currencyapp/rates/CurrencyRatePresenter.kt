@@ -19,7 +19,10 @@ class CurrencyRatePresenter @Inject constructor(private val currencyRateInteract
             currencyRateInteractor
                 .getAllCurrencies()
                 .subscribe({
-                    view { updateCurrency(it) }
+                    view {
+                        updateCurrency(it)
+                        stopUpdating()
+                    }
                 }, {})
         )
     }
@@ -27,14 +30,14 @@ class CurrencyRatePresenter @Inject constructor(private val currencyRateInteract
     fun onCurrencyClick(baseCurrency: CurrencyItem) {
         unSubscribeOnDetach(
             currencyRateInteractor.changeBaseCurrency(baseCurrency)
-                .subscribe({}, {})
+                .subscribe({ view { updateCurrency(it) } }, {})
         )
     }
 
     fun onValueChange(baseItem: CurrencyItem) {
         unSubscribeOnDetach(
             currencyRateInteractor.changeValue(baseItem)
-                .subscribe({}, {})
+                .subscribe({ view { updateCurrency(it) } }, {})
         )
     }
 

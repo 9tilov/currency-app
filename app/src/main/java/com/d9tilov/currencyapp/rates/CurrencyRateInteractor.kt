@@ -9,6 +9,7 @@ import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import java.math.BigDecimal
 
 class CurrencyRateInteractor(
@@ -38,22 +39,20 @@ class CurrencyRateInteractor(
     }
 
     @WorkerThread
-    fun changeBaseCurrency(baseCurrency: CurrencyItem): Completable {
+    fun changeBaseCurrency(baseCurrency: CurrencyItem): Single<List<CurrencyItem>> {
         var localBaseCurrency: CurrencyItem = baseCurrency
         if (BuildConfig.RESET_BASE_VALUE_AFTER_CHOOSE) {
             localBaseCurrency = CurrencyItem(baseCurrency.name, BigDecimal.ONE, true)
         }
-        currencyLocalRepository.changeBaseCurrency(localBaseCurrency)
-        return updateCurrencyRates(localBaseCurrency)
+        return currencyLocalRepository.changeBaseCurrency(localBaseCurrency)
     }
 
-    fun changeValue(baseCurrency: CurrencyItem): Completable {
-        currencyLocalRepository.changeValue(baseCurrency)
-        return updateCurrencyRates(baseCurrency)
-
+    @WorkerThread
+    fun changeValue(baseCurrency: CurrencyItem): Single<List<CurrencyItem>> {
+        return currencyLocalRepository.changeValue(baseCurrency)
     }
 
     fun writeDataAndCancel() {
-        currencyLocalRepository.cancelWorking()
+        currencyLocalRepository.flushData()
     }
 }

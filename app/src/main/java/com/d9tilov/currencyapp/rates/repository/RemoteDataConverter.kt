@@ -11,8 +11,6 @@ object RemoteDataConverter {
         val date =
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(input.date)?.time ?: 0
         val currencyRateList = mutableSetOf<CurrencyItem>()
-        val baseItem = CurrencyItem(input.base, BigDecimal.ONE, true)
-        currencyRateList.add(baseItem)
         for ((key, value) in input.rates) {
             val item = CurrencyItem(key, value)
             currencyRateList.add(item)

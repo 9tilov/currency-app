@@ -4,6 +4,7 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 
 object CurrencyUtils {
+    const val TAG = "moggot1234"
     private const val ASCII_OFFSET = 0x41
     private const val UNICODE_FLAG_OFFSET = 0x1F1E6
     private val decimalFormatSymbols = DecimalFormatSymbols.getInstance()

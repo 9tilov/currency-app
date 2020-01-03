@@ -117,7 +117,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     companion object {
 
-        public const val TAG = "ExchangeRatesFragment"
+        const val TAG = "ExchangeRatesFragment"
 
         @JvmStatic
         fun newInstance() = ExchangeRatesFragment()

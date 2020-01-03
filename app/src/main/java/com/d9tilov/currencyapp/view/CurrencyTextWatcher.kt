@@ -4,7 +4,6 @@ import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import java.math.BigDecimal
 
 object CurrencyTextWatcher {
@@ -14,8 +13,9 @@ object CurrencyTextWatcher {
         editText.addTextChangedListener {
             val number = it.toString()
             if (!it.isNullOrEmpty() && number.toBigDecimalOrNull() != null && number.toBigDecimal().compareTo(
-                    BigDecimal.ZERO) != 0) {
-                Timber.d("division = " +  it.toString().toBigDecimal())
+                    BigDecimal.ZERO
+                ) != 0
+            ) {
                 subject.onNext(it.toString().toBigDecimal())
             } else {
                 subject.onNext(BigDecimal.ZERO)
