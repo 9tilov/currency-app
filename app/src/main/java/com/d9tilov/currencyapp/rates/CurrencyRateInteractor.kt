@@ -6,8 +6,8 @@ import com.d9tilov.currencyapp.network.CurrencyRemoteRepository
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
-import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import java.math.BigDecimal
@@ -20,13 +20,14 @@ class CurrencyRateInteractor(
 ) {
 
     @WorkerThread
-    fun updateCurrencyRates(baseItem: CurrencyItem?): Completable {
-        return Completable.fromSingle(
-            currencyRemoteRepository.updateCurrencyRates()
-                .map { t: CurrencyRateData ->
-                    currencyLocalRepository.updateCurrencyList(t, baseItem)
-                })
-            .doOnError { }
+    fun updateCurrencyRates(baseItem: CurrencyItem?): Observable<CurrencyRateData> {
+        return currencyRemoteRepository.updateCurrencyRates()
+            .flatMap { t: CurrencyRateData ->
+                currencyLocalRepository.updateCurrencyList(
+                    t,
+                    baseItem
+                )
+            }
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)
     }

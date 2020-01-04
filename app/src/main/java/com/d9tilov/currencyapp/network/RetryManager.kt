@@ -1,8 +1,8 @@
 package com.d9tilov.currencyapp.network
 
-import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 interface RetryManager {
-    fun observeRetries(error: Throwable): Observable<RetryEvent>
+    fun observeRetries(): PublishSubject<RetryEvent>
     fun retry()
 }

@@ -4,10 +4,9 @@ import androidx.annotation.WorkerThread
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.model.CurrencyDto
-import com.d9tilov.currencyapp.utils.CurrencyUtils.TAG
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.concurrent.Executor
 
@@ -21,7 +20,10 @@ class CurrencyLocalRepository(
         mutableListOf()
 
     @WorkerThread
-    fun updateCurrencyList(currencyRateData: CurrencyRateData, baseItem: CurrencyItem?) {
+    fun updateCurrencyList(
+        currencyRateData: CurrencyRateData,
+        baseItem: CurrencyItem?
+    ): Observable<CurrencyRateData> {
         val currencyRateList = mutableListOf<CurrencyDto>()
         val baseValue = baseItem?.value ?: throw IllegalAccessException("Can't find base item")
         for (item in currencyRateData.currencyList) {
@@ -29,6 +31,7 @@ class CurrencyLocalRepository(
             currencyRateList.add(CurrencyDto(item.name, newValue.toString()))
         }
         database.currencyDao().updateCurrencyList(currencyRateList)
+        return Observable.fromCallable { currencyRateData }
     }
 
     @WorkerThread
@@ -74,10 +77,6 @@ class CurrencyLocalRepository(
         val oldValue =
             localCopyOfCurrencyList.find { baseCurrency.name == it.name }?.value ?: BigDecimal.ONE
         val tmpList = mutableListOf<CurrencyItem>()
-        Timber.tag(TAG).d("oldCur = %s oldValue = %s", baseCurrency.name, oldValue)
-        for (item in localCopyOfCurrencyList) {
-            Timber.tag(TAG).d("oldCur1 = %s oldValue1 = %s", item.name, item.value)
-        }
         for (item in localCopyOfCurrencyList) {
             val newRecountedValue = item.value * baseCurrency.value / oldValue
             tmpList.add(CurrencyItem(item.name, newRecountedValue, item.name == baseCurrency.name))

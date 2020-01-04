@@ -8,8 +8,8 @@ private const val JOB_TAG = "currency_update"
 
 object BackgroundFactory {
     @MainThread
-    fun  enequeueJob(context: Context) {
+    fun enequeueJob(context: Context) {
         WorkManager.getInstance(context).cancelAllWorkByTag(JOB_TAG)
-        
+
     }
 }

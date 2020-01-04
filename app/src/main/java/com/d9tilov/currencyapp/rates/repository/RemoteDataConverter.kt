@@ -1,7 +1,6 @@
 package com.d9tilov.currencyapp.rates.repository
 
 import com.d9tilov.currencyapp.network.data.CurrencyResponse
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
 

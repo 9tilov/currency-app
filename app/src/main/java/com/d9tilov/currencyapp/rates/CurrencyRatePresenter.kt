@@ -10,6 +10,8 @@ class CurrencyRatePresenter @Inject constructor(private val currencyRateInteract
     fun updateCurrencyList(baseCurrency: CurrencyItem?) {
         unSubscribeOnDetach(
             currencyRateInteractor.updateCurrencyRates(baseCurrency)
+                .doOnError { view { onError() } }
+                .retryWhen { it.flatMap { retryManager.observeRetries() } }
                 .subscribe({}, { view { stopUpdating() } })
         )
     }

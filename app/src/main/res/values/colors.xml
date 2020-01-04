@@ -8,6 +8,7 @@
     <color name="longNameTextColor">#000000</color>
     <color name="valueTextColor">#000000</color>
     <color name="signTextColor">#808080</color>
+    <color name="snackbarBackgroundColor">#808080</color>
 
     <color name="colorNightDark">#212326</color>
 

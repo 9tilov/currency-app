@@ -5,7 +5,6 @@ import com.d9tilov.currencyapp.base.BaseActivity
 import com.d9tilov.currencyapp.di.ComponentHolder
 import com.d9tilov.currencyapp.di.component.MainComponent
 import com.d9tilov.currencyapp.rates.ExchangeRatesFragment
-import timber.log.Timber
 
 class MainActivity : BaseActivity() {
 
@@ -20,7 +19,8 @@ class MainActivity : BaseActivity() {
             MainComponent.Initializer.init()
         }.inject(this)
 
-        val fragment = supportFragmentManager.findFragmentByTag(ExchangeRatesFragment.TAG)?:ExchangeRatesFragment.newInstance()
+        val fragment = supportFragmentManager.findFragmentByTag(ExchangeRatesFragment.TAG)
+            ?: ExchangeRatesFragment.newInstance()
         supportFragmentManager
             .beginTransaction()
             .replace(getFragmentContainerId(), fragment, ExchangeRatesFragment.TAG)

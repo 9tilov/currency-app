@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.d9tilov.currencyapp.rates.recycler.CurrencyRateAdapter
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
+import com.google.android.material.snackbar.Snackbar
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -109,6 +111,24 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     override fun stopUpdating() {
         swipeToRefreshContainer.isEnabled = true
         swipeToRefreshContainer.isRefreshing = false
+    }
+
+    override fun onError() {
+        stopUpdating()
+        val snackbar = Snackbar.make(
+            rvCurrencyList,
+            getString(R.string.error_loading),
+            Snackbar.LENGTH_INDEFINITE
+        )
+        snackbar
+            .setAction(getString(R.string.retry)) { presenter.retryCall() }
+            .show()
+        snackbar.view.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.snackbarBackgroundColor
+            )
+        )
     }
 
     private val swipeToRefreshListener = {

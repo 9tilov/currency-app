@@ -25,7 +25,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     private val disposable = CompositeDisposable()
 
     private companion object {
-        enum class CURRENCY_VIEW_TYPE {
+        enum class CurrencyViewType {
             BASE,
             COMMON
         }
@@ -39,7 +39,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRateViewHolder {
         val context = parent.context
         val layoutId =
-            if (viewType == CURRENCY_VIEW_TYPE.BASE.ordinal) R.layout.base_currency_item else R.layout.currency_item
+            if (viewType == CurrencyViewType.BASE.ordinal) R.layout.base_currency_item else R.layout.currency_item
         val view = LayoutInflater.from(context).inflate(layoutId, parent, false)
         val viewHolder = CurrencyRateViewHolder(view)
         view.setOnClickListener {
@@ -52,7 +52,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
     }
 
     override fun onBindViewHolder(holder: CurrencyRateViewHolder, position: Int) {
-        holder.bind(currencies[position], holder.itemViewType == CURRENCY_VIEW_TYPE.BASE.ordinal)
+        holder.bind(currencies[position], holder.itemViewType == CurrencyViewType.BASE.ordinal)
     }
 
     override fun onBindViewHolder(
@@ -73,9 +73,9 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
 
     override fun getItemViewType(position: Int) =
         if (currencies[position].isBase)
-            CURRENCY_VIEW_TYPE.BASE.ordinal
+            CurrencyViewType.BASE.ordinal
         else
-            CURRENCY_VIEW_TYPE.COMMON.ordinal
+            CurrencyViewType.COMMON.ordinal
 
     override fun getItemCount() = currencies.size
 
