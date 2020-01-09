@@ -7,9 +7,9 @@ import javax.inject.Inject
 class CurrencyRatePresenter @Inject constructor(private val currencyRateInteractor: CurrencyRateInteractor) :
     BasePresenter<CurrencyRateView>() {
 
-    fun updateCurrencyList(baseCurrency: CurrencyItem?) {
+    fun updateCurrencyList() {
         unSubscribeOnDetach(
-            currencyRateInteractor.updateCurrencyRates(baseCurrency)
+            currencyRateInteractor.updateCurrencyRates()
                 .doOnError { view { onError() } }
                 .retryWhen { it.flatMap { retryManager.observeRetries() } }
                 .subscribe({}, { view { stopUpdating() } })

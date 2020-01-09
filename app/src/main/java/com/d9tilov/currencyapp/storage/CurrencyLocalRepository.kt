@@ -21,11 +21,10 @@ class CurrencyLocalRepository(
 
     @WorkerThread
     fun updateCurrencyList(
-        currencyRateData: CurrencyRateData,
-        baseItem: CurrencyItem?
+        currencyRateData: CurrencyRateData
     ): Observable<CurrencyRateData> {
         val currencyRateList = mutableListOf<CurrencyDto>()
-        val baseValue = baseItem?.value ?: throw IllegalAccessException("Can't find base item")
+        val baseValue = currencySharedPreferences.loadBaseCurrency().value
         for (item in currencyRateData.currencyList) {
             val newValue = baseValue * item.value
             currencyRateList.add(CurrencyDto(item.name, newValue.toString()))

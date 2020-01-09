@@ -20,13 +20,10 @@ class CurrencyRateInteractor(
 ) {
 
     @WorkerThread
-    fun updateCurrencyRates(baseItem: CurrencyItem?): Observable<CurrencyRateData> {
+    fun updateCurrencyRates(): Observable<CurrencyRateData> {
         return currencyRemoteRepository.updateCurrencyRates()
             .flatMap { t: CurrencyRateData ->
-                currencyLocalRepository.updateCurrencyList(
-                    t,
-                    baseItem
-                )
+                currencyLocalRepository.updateCurrencyList(t)
             }
             .subscribeOn(schedulerIo)
             .observeOn(schedulerMain)

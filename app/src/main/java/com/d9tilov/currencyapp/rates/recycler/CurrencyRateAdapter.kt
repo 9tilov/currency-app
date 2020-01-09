@@ -15,7 +15,6 @@ import com.d9tilov.currencyapp.view.CurrencyCardView
 import com.d9tilov.currencyapp.view.CurrencyTextWatcher
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 
@@ -121,7 +120,7 @@ class CurrencyRateAdapter : RecyclerView.Adapter<CurrencyRateAdapter.CurrencyRat
                         it ?: BigDecimal.ONE,
                         0
                     )
-                }, { Timber.d("oneerror = %s", it) })
+                }, {})
         }
     }
 }

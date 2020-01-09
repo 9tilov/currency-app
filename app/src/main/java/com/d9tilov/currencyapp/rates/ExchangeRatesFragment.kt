@@ -95,7 +95,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     override fun onStart() {
         super.onStart()
-        presenter.updateCurrencyList(CurrencyItem("EUR", BigDecimal.ONE, true))
+        presenter.updateCurrencyList()
     }
 
     override fun onStop() {
@@ -132,7 +132,7 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     }
 
     private val swipeToRefreshListener = {
-        presenter.updateCurrencyList(adapter.getBaseItem())
+        presenter.updateCurrencyList()
     }
 
     companion object {

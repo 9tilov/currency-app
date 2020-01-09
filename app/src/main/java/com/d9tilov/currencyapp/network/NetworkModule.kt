@@ -1,6 +1,10 @@
 package com.d9tilov.currencyapp.network
 
+import androidx.work.WorkerFactory
+import com.d9tilov.currencyapp.background.DaggerWorkerFactory
 import com.d9tilov.currencyapp.core.Constants
+import com.d9tilov.currencyapp.storage.CurrencyLocalRepository
+import com.d9tilov.currencyapp.storage.CurrencySharedPreferences
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -75,5 +79,23 @@ class NetworkModule {
     fun provideApiService(retrofit: Retrofit): RevolutApi {
         return retrofit
             .create(RevolutApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteRepo(
+        revolutApi: RevolutApi,
+        sharedPreferences: CurrencySharedPreferences
+    ): CurrencyRemoteRepository {
+        return CurrencyRemoteRepository(revolutApi, sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkerFactory(
+        currencyRemoteRepository: CurrencyRemoteRepository,
+        currencyLocalRepository: CurrencyLocalRepository
+    ): WorkerFactory {
+        return DaggerWorkerFactory(currencyRemoteRepository, currencyLocalRepository)
     }
 }

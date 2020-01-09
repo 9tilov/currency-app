@@ -33,6 +33,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "boolean", "RESET_BASE_VALUE_AFTER_CHOOSE", "true"
+        buildConfigField "long", "BACKGROUND_UPDATE_TIME_IN_MINUTES", "60"
     }
     buildTypes {
         release {

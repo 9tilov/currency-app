@@ -1,7 +1,7 @@
 package com.d9tilov.currencyapp.di.component
 
 import android.content.Context
-import com.d9tilov.currencyapp.MainActivity
+import com.d9tilov.currencyapp.App
 import com.d9tilov.currencyapp.di.ApplicationProvider
 import com.d9tilov.currencyapp.di.module.ContextModule
 import com.d9tilov.currencyapp.network.NetworkModule
@@ -18,7 +18,7 @@ import javax.inject.Singleton
 )
 interface AppComponent : ApplicationProvider {
 
-    fun inject(activity: MainActivity)
+    fun inject(app: App)
 
     class Initializer private constructor() {
         companion object {
