@@ -3,6 +3,9 @@ package com.d9tilov.currencyapp.rates
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.ViewStub
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -29,7 +32,9 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     private val adapter: CurrencyRateAdapter =
         CurrencyRateAdapter()
     private lateinit var rvCurrencyList: RecyclerView
+    private lateinit var stub: ViewStub
     private lateinit var swipeToRefreshContainer: SwipeRefreshLayout
+    private var snackBar: Snackbar? = null
 
     override val layoutRes: Int
         get() = R.layout.fragment_exchange_rates
@@ -67,6 +72,8 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         super.onViewCreated(view, savedInstanceState)
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         rvCurrencyList = view.findViewById(R.id.rv_currency_rate_list)
+        stub = view.findViewById(R.id.exchange_stub)
+        stub.inflate()
         swipeToRefreshContainer = view.findViewById(R.id.currency_container)
         rvCurrencyList.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(requireContext())
@@ -104,6 +111,12 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
     }
 
     override fun updateCurrency(currencyList: List<CurrencyItem>) {
+        if (currencyList.isEmpty()) {
+            stub.visibility = VISIBLE
+        } else {
+            snackBar?.dismiss()
+            stub.visibility = GONE
+        }
         adapter.updateCurrencyRate(currencyList)
         stopUpdating()
     }
@@ -115,15 +128,13 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
 
     override fun onError() {
         stopUpdating()
-        val snackbar = Snackbar.make(
+        snackBar = Snackbar.make(
             rvCurrencyList,
             getString(R.string.error_loading),
             Snackbar.LENGTH_INDEFINITE
         )
-        snackbar
-            .setAction(getString(R.string.retry)) { presenter.retryCall() }
-            .show()
-        snackbar.view.setBackgroundColor(
+        snackBar?.setAction(getString(R.string.retry)) { presenter.retryCall() }?.show()
+        snackBar?.view?.setBackgroundColor(
             ContextCompat.getColor(
                 requireContext(),
                 R.color.snackbarBackgroundColor

@@ -32,6 +32,8 @@ android {
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        vectorDrawables.useSupportLibrary true
+
         buildConfigField "boolean", "RESET_BASE_VALUE_AFTER_CHOOSE", "true"
         buildConfigField "long", "BACKGROUND_UPDATE_TIME_IN_MINUTES", "60"
     }

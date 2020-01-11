@@ -2,4 +2,5 @@
     <string name="app_name">CurrencyApp</string>
     <string name="retry">Retry</string>
     <string name="error_loading">Loading error</string>
+    <string name="nothing_found">Nothing found</string>
 </resources>
