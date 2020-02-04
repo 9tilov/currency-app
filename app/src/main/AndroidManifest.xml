@@ -26,6 +26,9 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="2447e1562aa5ef4c3fb53707b50c12f2cf218a93" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1475613019168586~3555371864"/>
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="com.d9tilov.currencyapp.workmanager-init"

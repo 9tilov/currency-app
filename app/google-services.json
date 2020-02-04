@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "747331246604",
+    "firebase_url": "https://currencyapp-8e612.firebaseio.com",
+    "project_id": "currencyapp-8e612",
+    "storage_bucket": "currencyapp-8e612.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747331246604:android:261dd48f73d1b1725b2c29",
+        "android_client_info": {
+          "package_name": "com.d9tilov.currencyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "747331246604-c5bklcpiibn7plisf37vnj9v9hmrnk6s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.d9tilov.currencyapp",
+            "certificate_hash": "b33abe2cb8f9dce56d241e5cc9dc986829ed87f9"
+          }
+        },
+        {
+          "client_id": "747331246604-umon4o08fun518ne0rfpuba68h9gm48e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWBh4LINTKoDULgywUXSSRcR_ESkyDMus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747331246604-umon4o08fun518ne0rfpuba68h9gm48e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

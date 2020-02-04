@@ -6,6 +6,7 @@ import com.d9tilov.currencyapp.base.BaseActivity
 import com.d9tilov.currencyapp.di.ComponentHolder
 import com.d9tilov.currencyapp.di.component.MainComponent
 import com.d9tilov.currencyapp.rates.ExchangeRatesFragment
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : BaseActivity() {
 
@@ -16,6 +17,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        MobileAds.initialize(this)
         ComponentHolder.provideComponent(MainComponent::class.java.name) {
             MainComponent.Initializer.init()
         }.inject(this)

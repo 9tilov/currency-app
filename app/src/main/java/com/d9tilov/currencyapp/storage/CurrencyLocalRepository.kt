@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.rates.repository.CurrencyRateData
 import com.d9tilov.currencyapp.storage.model.CurrencyDto
+import com.d9tilov.currencyapp.utils.CurrencyUtils.getCurrencyFullName
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -87,7 +88,7 @@ class CurrencyLocalRepository(
     }
 
     private fun sortCurrency() {
-        localCopyOfCurrencyList.sortWith(compareBy({ !it.isBase }, { it.name }))
+        localCopyOfCurrencyList.sortWith(compareBy({ !it.isBase }, { getCurrencyFullName(it.name) }))
     }
 
     fun flushData() {

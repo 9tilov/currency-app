@@ -4,12 +4,15 @@ import androidx.recyclerview.widget.DiffUtil
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 
 class CurrencyDiffUtil(
-    private val oldCurrenciesList: List<CurrencyItem>,
-    private val newCurrenciesList: List<CurrencyItem>
+    private val oldCurrenciesList: List<Any>,
+    private val newCurrenciesList: List<Any>
 ) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldCurrenciesList[oldItemPosition].name == newCurrenciesList[newItemPosition].name
+        return (oldCurrenciesList[oldItemPosition] is CurrencyItem)
+                && (newCurrenciesList[newItemPosition] is CurrencyItem)
+                && (oldCurrenciesList[oldItemPosition] as CurrencyItem).name ==
+                (newCurrenciesList[newItemPosition] as CurrencyItem).name
     }
 
     override fun getOldListSize(): Int {
@@ -21,11 +24,11 @@ class CurrencyDiffUtil(
     }
 
     override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        return newCurrenciesList[newItemPosition].value
+        return (newCurrenciesList[newItemPosition] as CurrencyItem).value
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldCurrenciesList[oldItemPosition].value ==
-                newCurrenciesList[newItemPosition].value
+        return (oldCurrenciesList[oldItemPosition] as CurrencyItem).value ==
+                (newCurrenciesList[newItemPosition] as CurrencyItem).value
     }
 }

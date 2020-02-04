@@ -2,6 +2,7 @@ package com.d9tilov.currencyapp.rates
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -17,11 +18,17 @@ import com.d9tilov.currencyapp.R
 import com.d9tilov.currencyapp.base.BaseMvpFragment
 import com.d9tilov.currencyapp.di.ComponentHolder
 import com.d9tilov.currencyapp.rates.recycler.CurrencyRateAdapter
+import com.d9tilov.currencyapp.rates.recycler.CurrencyRateAdapter.Companion.AD_POSITION_FREQUENCY
 import com.d9tilov.currencyapp.rates.repository.CurrencyItem
 import com.d9tilov.currencyapp.utils.listeners.OnItemClickListener
 import com.d9tilov.currencyapp.utils.listeners.OnValueChangeListener
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.material.snackbar.Snackbar
 import java.math.BigDecimal
+import java.util.*
 import javax.inject.Inject
 
 class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePresenter>(),
@@ -85,7 +92,6 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
             )
         )
         rvCurrencyList.itemAnimator = DefaultItemAnimator()
-        rvCurrencyList.adapter = adapter
         adapter.itemClickListener = onItemClickListener
         adapter.valueChangeLister = onValueChangeListener
         swipeToRefreshContainer.setProgressBackgroundColorSchemeResource(
@@ -105,9 +111,39 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
         presenter.updateCurrencyList()
     }
 
+    override fun onResume() {
+        val items = adapter.getItems()
+        for (item in items) {
+            if (item is AdView) {
+                item.resume()
+            }
+        }
+        super.onResume()
+    }
+
+    override fun onPause() {
+        val items = adapter.getItems()
+        for (item in items) {
+            if (item is AdView) {
+                item.pause()
+            }
+        }
+        super.onPause()
+    }
+
     override fun onStop() {
         super.onStop()
         presenter.onStop()
+    }
+
+    override fun onDestroy() {
+        val items = adapter.getItems()
+        for (item in items) {
+            if (item is AdView) {
+                item.destroy()
+            }
+        }
+        super.onDestroy()
     }
 
     override fun updateCurrency(currencyList: List<CurrencyItem>) {
@@ -117,8 +153,58 @@ class ExchangeRatesFragment : BaseMvpFragment<CurrencyRateView, CurrencyRatePres
             snackBar?.dismiss()
             stub.visibility = GONE
         }
-        adapter.updateCurrencyRate(currencyList)
+        val listWithAd = LinkedList<Any>()
+        listWithAd.addAll(currencyList)
+
+        var i = 0
+        while (i < listWithAd.size) {
+            if (AD_POSITION_FREQUENCY == 0) {
+                break
+            }
+            if (i != 0 && (i % AD_POSITION_FREQUENCY == 0)) {
+                val adView = AdView(requireContext())
+                adView.adSize = AdSize.BANNER
+                adView.adUnitId = getString(R.string.banner_ad_view_type_id)
+                listWithAd.add(i, adView)
+            }
+            ++i
+        }
+        adapter.updateCurrencyRate(listWithAd)
         stopUpdating()
+        loadBannerAds()
+        rvCurrencyList.adapter = adapter
+    }
+
+    private fun loadBannerAds() {
+        loadBannerAd(AD_POSITION_FREQUENCY)
+    }
+
+    /**
+     * Loads the banner ads in the items list.
+     */
+    private fun loadBannerAd(index: Int) {
+        val items = adapter.getItems()
+        if (index >= items.size) {
+            return
+        }
+        val item: Any = items[index]
+        if (item is AdView) {
+            item.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    loadBannerAd(index + AD_POSITION_FREQUENCY)
+                }
+                override fun onAdFailedToLoad(errorCode: Int) {
+                    Log.e(
+                        "MainActivity", "The previous banner ad failed to load. Attempting to"
+                                + " load the next banner ad in the items list."
+                    )
+                    loadBannerAd(index + AD_POSITION_FREQUENCY)
+                }
+            }
+            // Load the banner ad.
+            item.loadAd(AdRequest.Builder().build())
+        }
     }
 
     override fun stopUpdating() {
